@@ -1,18 +1,20 @@
-const express=require('express')
-const router=new express.Router()
+const express = require('express');
+const User = require('../models/usersShcema');
 
-app.post('/users', async (req,res) => {
-    const user = new User(req.body)
+const router = express.Router();
 
-    try{
-        await user.save()
-        res.status(201).send()
-    } catch(e){
-        res.status(400).send(e)
+router.post('/users', async (req, res) => {
+    const user = new User(req.body);
+    try {
+        await user.save();
+        res.status(201).send(user);
+    } catch (e) {
+        res.status(400).send(e);
     }
-})
-router.get('/test', async(req,res)=>{
-    res.send('From user.js')
-})
+});
 
-module.exports=userRouter
+router.get('/test', (req, res) => {
+    res.send('From user.js');
+});
+
+module.exports = router;
