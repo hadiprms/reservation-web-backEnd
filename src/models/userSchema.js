@@ -51,6 +51,19 @@ UserSchema.pre('save', async function(next) {
     next();
 });
 
+UserSchema.statics.findByCredentials = async(email , password)=>{
+    const user = await User.findOne({ email })
+    if(!user){
+        throw new Error('!user')
+    }
+
+    const isMatch=await bcrypt.compare(password , user.password)
+    if(!isMatch){
+        throw new Error('!isMatch')
+    }
+    return user
+}
+
 UserSchema.methods.generateAuthToken = async function(){
     const user = this
     const token = jwt.sign({ _id:user._id.toString() }, 'this Is Secret Code')
