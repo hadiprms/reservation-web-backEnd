@@ -4,13 +4,15 @@ require('./db/mongoose');
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
 const airplaneRouter = require('./routers/airplane');
+const hotelRouter = require('./routers/hotel')
 const app = express();
 const port = 3000;
 
 app.use(express.json());
 app.use(userRouter);
 app.use(tourRouter);
-app.use(airplaneRouter)
+app.use(airplaneRouter);
+app.use(hotelRouter);
 
 app.listen(port, () => {
     console.log('Listening on port', port);
