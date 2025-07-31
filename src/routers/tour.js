@@ -3,7 +3,7 @@ const Tour = require('../models/tourSchema')
 
 const router = express.Router();
 
-router.post('/tours' , async (req,res) =>{
+router.post('/tour' , async (req,res) =>{
     const tour = new Tour(req.body)
     try{
         await tour.save()
