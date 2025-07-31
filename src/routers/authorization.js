@@ -38,4 +38,14 @@ router.post('/logout' , auth , async (req,res) =>{
     }
 })
 
+router.post('/logoutAll' , auth , async (req,res) =>{
+    try{
+        req.user.tokens = []
+        await req.user.save()
+        res.send()
+    }catch(e){
+
+    }
+})
+
 module.exports = router;
