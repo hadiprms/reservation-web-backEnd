@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/userSchema');
-const auth = require('../authorization/authorization')
+const auth = require('../authorization/authorization');
+const { route } = require('./user');
 
 const router = express.Router();
 
@@ -53,7 +54,7 @@ router.post('/logoutAll' , auth , async (req,res) =>{
     }
 })
 
-router.delete('/deleteAccount/:id', async (req, res) => {
+router.delete('/deleteAccount/:id', auth , async (req, res) => {
   const userId = req.params.id;
 
   try {
