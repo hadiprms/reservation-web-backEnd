@@ -4,7 +4,7 @@ const auth = require('../authorization/authorization')
 
 const router = express.Router();
 
-router.post('/regester' , async (req, res) => {
+router.post('/signup' , async (req, res) => {
     const user = new User(req.body)
     const token = await user.generateAuthToken()
     try {
