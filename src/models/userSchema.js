@@ -17,7 +17,6 @@ const UserSchema = new mongoose.Schema({
     email:{
         type: String,
         required: true,
-        unique: true,
         trim: true,
         lowercase: true,
         validate(value) {
@@ -34,6 +33,10 @@ const UserSchema = new mongoose.Schema({
     reservations:[{
         //must fill later
     }],
+    deletedAt:{
+        type: Date,
+        default: null
+    },
     tokens:[{
         token:{
         type: String,

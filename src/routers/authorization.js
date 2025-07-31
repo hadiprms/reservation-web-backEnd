@@ -4,15 +4,20 @@ const auth = require('../authorization/authorization')
 
 const router = express.Router();
 
-router.post('/signup' , async (req, res) => {
-    const user = new User(req.body)
-    const token = await user.generateAuthToken()
-    try {
-        await user.save();
-        res.status(201).send({user, token});
-    } catch (error) {
-        res.status(400).send(error);
+router.post('/signup', async (req, res) => {
+  try {
+    const existingUser = await User.findOne({ email: req.body.email, deletedAt: null });
+    if (existingUser) {
+      return res.status(400).send({ error: 'Email is already in use' });
     }
+
+    const user = new User(req.body);
+    const token = await user.generateAuthToken();
+    await user.save();
+    res.status(201).send({ user, token });
+  } catch (error) {
+    res.status(400).send(error);
+  }
 });
 
 router.post('/login' , async (req,res)=>{
@@ -47,5 +52,16 @@ router.post('/logoutAll' , auth , async (req,res) =>{
 
     }
 })
+
+router.delete('/deleteAccount/:id', async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    await User.findByIdAndUpdate(userId, { deletedAt: new Date() });
+    res.status(200).send({ message: 'User soft deleted successfully' });
+  } catch (err) {
+    res.status(500).send({ error: 'Failed to delete user' });
+  }
+});
 
 module.exports = router;
