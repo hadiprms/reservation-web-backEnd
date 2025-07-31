@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const TourSchema = new mongoose.Schema({
     companyName:{
         type: String,
+        //must not fill with hand, should get user account name
         required: true
     },
     origin:{
