@@ -24,6 +24,12 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
       return res.status(404).send()
     }
 
+    for (let update of updates) {
+      if (req.body[update] === user[update]) {
+        return res.status(400).send({ error: `No change detected in ${update}` });
+      }
+    }
+
     updates.forEach(update => {
       user[update] = req.body[update]
     })
