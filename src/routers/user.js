@@ -4,9 +4,37 @@ const auth = require('../authorization/authorization')
 
 const router = express.Router();
 
-router.get('/users/me' , auth , async (req, res) => {
+router.get('/users/me' , auth , async (req , res) => {
     res.send(req.user);
 });
 
+router.patch('/edit/me/:id', auth, async (req, res) => {
+  const updates = Object.keys(req.body)
+  const allowedUpdates = ['firstName', 'lastName' , 'password']
+  const isValid = updates.every(update => allowedUpdates.includes(update))
+
+  if (!isValid) {
+    return res.status(400).send({ error: 'Invalid update' })
+  }
+
+  try {
+    const user = await User.findById(req.params.id)
+
+    if (!user) {
+      return res.status(404).send()
+    }
+
+    updates.forEach(update => {
+      user[update] = req.body[update]
+    })
+
+
+    await user.save()
+
+    res.send(user)
+  } catch (e) {
+    res.status(400).send(e)
+  }
+})
 
 module.exports = router;
