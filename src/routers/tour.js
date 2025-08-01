@@ -18,4 +18,13 @@ router.post('/tour', async (req, res) => {
     }
 });
 
+router.get('/tours' , async (req , res) =>{
+    try {
+        const tours = await Tour.find({});
+        res.send(tours);
+    } catch (error) {
+        res.status(500).send({ error: 'Failed to fetch tours.' });
+    }
+})
+
 module.exports = router;
