@@ -1,5 +1,7 @@
 const express = require('express')
-const Tour = require('../models/tourSchema')
+const Tour = require('../models/tourSchema');
+const auth = require('../authorization/authorization');
+const User = require('../models/userSchema');
 
 const router = express.Router();
 
@@ -15,6 +17,25 @@ router.post('/tour', async (req, res) => {
         res.status(201).send(tour);
     } catch (error) {
         res.status(400).send(error);
+    }
+});
+
+router.post('/reserve/:tourId', auth , async (req, res) => {
+    const userId = req.user._id;
+    const tourId = req.params.tourId;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        user.reservations.push({ tourId });
+        await user.save();
+
+        res.send({ message: 'Reservation successful' });
+    } catch (err) {
+        res.status(500).send({ error: 'Error reserving tour' });
     }
 });
 

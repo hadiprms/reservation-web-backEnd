@@ -30,8 +30,16 @@ const UserSchema = new mongoose.Schema({
         required: true
         //set min and max length
     },
-    reservations:[{
-        //must fill later
+    reservations: [{
+        tourId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Tour',
+            required: true
+        },
+        reservationDate: {
+            type: Date,
+            default: Date.now
+        }
     }],
     deletedAt:{
         type: Date,

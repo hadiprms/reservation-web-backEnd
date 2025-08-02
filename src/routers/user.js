@@ -43,4 +43,11 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
   }
 })
 
+router.get('/my-reservations', auth , async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate('reservations.tourId');
+    res.send(user.reservations);
+});
+
 module.exports = router;
