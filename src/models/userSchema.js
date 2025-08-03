@@ -4,6 +4,11 @@ const validator = require('validator');
 const jwt = require('jsonwebtoken');
 
 const UserSchema = new mongoose.Schema({
+    role: {
+        type: String,
+        enum: ['Admin', 'User'],
+        default: 'User'
+    },
     firstName:{
         type: String,
         required: true,
