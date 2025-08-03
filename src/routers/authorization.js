@@ -1,8 +1,6 @@
 const express = require('express');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
-const {checkAdmin} = require('../authorization/checkRole');
-
 
 const router = express.Router();
 
@@ -60,7 +58,7 @@ router.delete('/deleteAccount/:id', auth , async (req, res) => {
   //not with id
   try {
     await User.findByIdAndUpdate(userId, { deletedAt: new Date() });
-    res.status(200).send({ message: 'User soft deleted successfully' });
+    res.status(200).send({ message: 'User deleted successfully' });
   } catch (err) {
     res.status(500).send({ error: 'Failed to delete user' });
   }
