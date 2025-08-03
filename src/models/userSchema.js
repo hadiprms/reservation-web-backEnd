@@ -61,6 +61,10 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
+    bannedAt:{
+        type: Date,
+        default: null
+    },
     tokens:[{
         token:{
         type: String,
@@ -99,6 +103,21 @@ UserSchema.methods.generateAuthToken = async function(){
     await user.save()
     return token
 }
+
+UserSchema.statics.findByCredentials = async (email, password) => {
+  const user = await User.findOne({ email, deletedAt: null });
+  if (!user) {
+    throw new Error('User not found');
+  }
+  if (user.bannedAt) {
+    throw new Error('User is banned');
+  }
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) {
+    throw new Error('Invalid credentials');
+  }
+  return user;
+};
 
 const User = mongoose.model('User', UserSchema);
 
