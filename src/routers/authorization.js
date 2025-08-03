@@ -1,7 +1,7 @@
 const express = require('express');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
-const checkAdmin = require('../authorization/checkRole');
+const {checkAdmin} = require('../authorization/checkRole');
 
 
 const router = express.Router();

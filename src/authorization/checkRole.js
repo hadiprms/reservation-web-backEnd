@@ -51,4 +51,4 @@ const checkMarketer = async (req, res, next) => {
 //     }
 // }
 
-module.exports =  checkAdmin , checkMarketer;
+module.exports =  {checkAdmin , checkMarketer};
