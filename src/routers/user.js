@@ -50,4 +50,11 @@ router.get('/my-tourReservations', auth , async (req, res) => {
     res.send(user.tourReservations);
 });
 
+router.get('/my-hotelReservations', auth , async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate('hotelReservations.hotelId');
+    res.send(user.hotelReservations);
+});
+
 module.exports = router;

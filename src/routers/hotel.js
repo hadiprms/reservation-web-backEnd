@@ -1,5 +1,7 @@
 const express = require('express')
-const Hotel = require('../models/hotelSchema')
+const Hotel = require('../models/hotelSchema');
+const User = require('../models/userSchema');
+const auth = require('../authorization/authorization');
 
 const router = express.Router()
 
@@ -15,6 +17,25 @@ router.post('/hotel', async (req, res) => {
         res.status(201).send(hotel);
     } catch (error) {
         res.status(400).send(error);
+    }
+});
+
+router.post('/reserve-hotel/:hotelId', auth , async (req, res) => {
+    const userId = req.user._id;
+    const hotelId = req.params.hotelId;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+
+        user.hotelReservations.push({ hotelId });
+        await user.save();
+
+        res.send({ message: 'Reservation successful' });
+    } catch (err) {
+        res.status(500).send({ error: 'Error reserving tour' });
     }
 });
 

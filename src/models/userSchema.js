@@ -41,6 +41,17 @@ const UserSchema = new mongoose.Schema({
             default: Date.now
         }
     }],
+    hotelReservations: [{
+        hotelId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Hotel',
+            required: true
+        },
+        reservationDate: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     deletedAt:{
         type: Date,
         default: null
