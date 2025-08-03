@@ -79,7 +79,7 @@ router.post('/banAccount/:id', auth, checkAdmin , async (req, res) => {
     }
 
     if (requester.role === 'Admin' && userToBan.role === 'Admin') {
-      return res.status(403).send({ error: 'Owners cannot ban other Owner or other Admins' });
+      return res.status(403).send({ error: 'Admins cannot ban other Owner or other Admins' });
     }
 
     // Check if the user is already banned
