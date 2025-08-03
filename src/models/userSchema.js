@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
         required: true
         //set min and max length
     },
-    reservations: [{
+    tourReservations: [{
         tourId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Tour',

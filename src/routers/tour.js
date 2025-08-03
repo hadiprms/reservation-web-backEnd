@@ -20,7 +20,7 @@ router.post('/tour', async (req, res) => {
     }
 });
 
-router.post('/reserve/:tourId', auth , async (req, res) => {
+router.post('/reserve-tour/:tourId', auth , async (req, res) => {
     const userId = req.user._id;
     const tourId = req.params.tourId;
 
@@ -30,7 +30,7 @@ router.post('/reserve/:tourId', auth , async (req, res) => {
             return res.status(404).send({ error: 'User not found' });
         }
 
-        user.reservations.push({ tourId });
+        user.tourReservations.push({ tourId });
         await user.save();
 
         res.send({ message: 'Reservation successful' });
