@@ -120,5 +120,29 @@ router.get('/admin/role-requests', async (req, res) => {
   }
 });
 
+router.patch('/admin/approve-role-request/:id', auth, checkRole(['SuperAdmin' , 'Admin']), async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user || user.deletedAt) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    if (user.roleRequest) {
+      // Update user's role to roleRequest and reset roleRequest
+      user.role = user.roleRequest;
+      user.roleRequest = null;
+      await user.save();
+
+      res.send({ message: `User's role updated to ${user.role} based on role request.` });
+    } else {
+      res.status(400).send({ error: 'No role request found for this user' });
+    }
+  } catch (err) {
+    res.status(500).send({ error: 'Failed to process role request' });
+  }
+});
 
 module.exports = router;
