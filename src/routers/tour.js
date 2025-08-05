@@ -6,7 +6,7 @@ const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router();
 
-router.post('/tour', auth , checkRole('Marketer') , async (req, res) => {
+router.post('/tour', auth , checkRole(['Admin', 'Marketer', 'SuperAdmin']) , async (req, res) => {
     try {
         const existingTour = await Tour.findOne(req.body);
         if (existingTour) {

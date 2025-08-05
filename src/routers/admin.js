@@ -5,7 +5,7 @@ const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router();
 
-router.post('/banAccount/:id', auth, checkRole('Admin') , async (req, res) => {
+router.post('/banAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 
@@ -33,7 +33,7 @@ router.post('/banAccount/:id', auth, checkRole('Admin') , async (req, res) => {
   }
 });
 
-router.post('/unbanAccount/:id', auth, checkRole('Admin') , async (req, res) => {
+router.post('/unbanAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 
@@ -45,7 +45,7 @@ router.post('/unbanAccount/:id', auth, checkRole('Admin') , async (req, res) => 
       return res.status(404).send({ error: 'User not found' });
     }
 
-    if (requester.role === 'Admin' && userToBan.role === 'Admin') {
+    if (requester.role === 'Admin' && userToBan.role === 'Admin' || 'SuperAdmin') {
       return res.status(403).send({ error: 'Admins cannot unban other Owner or other Admins' });
     }
 
