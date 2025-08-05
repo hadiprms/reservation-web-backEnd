@@ -111,4 +111,14 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole(['SuperAdmin'])
   }
 });
 
+router.get('/admin/role-requests', async (req, res) => {
+  try {
+    const requests = await User.find({ roleRequest: { $ne: null } });
+    res.send(requests);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
 module.exports = router;
