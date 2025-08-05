@@ -6,7 +6,7 @@ const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router()
 
-router.post('/hotel', auth , checkRole('Admin') , async (req, res) => {
+router.post('/hotel', auth , checkRole('Marketer') , async (req, res) => {
     try {
         const existingHotel = await Hotel.findOne(req.body);
         if (existingHotel) {
