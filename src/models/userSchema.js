@@ -9,6 +9,10 @@ const UserSchema = new mongoose.Schema({
         enum: ['SuperAdmin','Admin', 'Marketer', 'User'],
         default: 'User'
     },
+    roleRequest: {
+        type: String,
+        default: null 
+    },
     firstName:{
         type: String,
         required: true,
