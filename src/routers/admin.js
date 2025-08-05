@@ -1,12 +1,11 @@
 const express = require('express');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
-const {checkAdmin} = require('../authorization/checkRole');
-
+const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router();
 
-router.post('/banAccount/:id', auth, checkAdmin , async (req, res) => {
+router.post('/banAccount/:id', auth, checkRole('Admin') , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 
@@ -34,7 +33,7 @@ router.post('/banAccount/:id', auth, checkAdmin , async (req, res) => {
   }
 });
 
-router.post('/unbanAccount/:id', auth, checkAdmin , async (req, res) => {
+router.post('/unbanAccount/:id', auth, checkRole('Admin') , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 

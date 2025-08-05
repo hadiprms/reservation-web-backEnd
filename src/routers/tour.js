@@ -2,11 +2,11 @@ const express = require('express')
 const Tour = require('../models/tourSchema');
 const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
-const {checkMarketer} = require('../authorization/checkRole');
+const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router();
 
-router.post('/tour', auth , checkMarketer , async (req, res) => {
+router.post('/tour', auth , checkRole('Marketer') , async (req, res) => {
     try {
         const existingTour = await Tour.findOne(req.body);
         if (existingTour) {

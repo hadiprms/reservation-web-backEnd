@@ -2,11 +2,11 @@ const express = require('express')
 const Hotel = require('../models/hotelSchema');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
-const {checkMarketer} = require('../authorization/checkRole');
+const { checkRole } = require('../authorization/checkRole');
 
 const router = express.Router()
 
-router.post('/hotel', auth , checkMarketer , async (req, res) => {
+router.post('/hotel', auth , checkRole('Admin') , async (req, res) => {
     try {
         const existingHotel = await Hotel.findOne(req.body);
         if (existingHotel) {
