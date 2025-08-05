@@ -4,7 +4,7 @@ const auth = require('../authorization/authorization');
 
 const router = express.Router();
 
-router.post('/user-signup', async (req, res) => {
+router.post('/signup', async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email, deletedAt: null });
     if (existingUser) {
