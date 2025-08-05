@@ -11,30 +11,15 @@ router.post('/user-signup', async (req, res) => {
       return res.status(400).send({ error: 'Email is already in use' });
     }
 
-    const user = new User(req.body);
+    const { roleRequest, ...userData } = req.body; // extract roleRequest
+
+    const user = new User({
+      ...userData,
+      roleRequest: roleRequest || null, // store request if any
+    });
+
     const token = await user.generateAuthToken();
-    await user.save();
-    
-    res.status(201).send({ user, token });
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
 
-router.post('/markter-signup', async (req, res) => {
-  try {
-    const existingMarketer = await User.findOne({ email: req.body.email, deletedAt: null });
-    if (existingMarketer) {
-      return res.status(400).send({ error: 'Email is already in use' });
-    }
-
-    const userData = {
-      ...req.body,
-      role: 'Marketer'
-    };
-
-    const user = new User(userData);
-    const token = await user.generateAuthToken();
     await user.save();
 
     res.status(201).send({ user, token });
