@@ -61,4 +61,29 @@ router.post('/unbanAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async
   }
 });
 
+router.patch('/admin/change-user-role/:id', auth, checkRole(['SuperAdmin','Admin']), async (req, res) => {
+  const userId = req.params.id;
+  const { role } = req.body;
+
+  // Validate role
+  const validRoles = ['Marketer', 'User'];
+  if (!validRoles.includes(role)) {
+    return res.status(400).send({ error: 'Invalid role' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user || user.deletedAt) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.send({ message: `role updated successfully to ${role}` });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
 module.exports = router;
