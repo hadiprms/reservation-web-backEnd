@@ -17,17 +17,17 @@ router.post('/banAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (
       return res.status(404).send({ error: 'User not found' });
     }
 
-    if (requester.role === 'Admin' && userToBan.role === 'Admin') {
-      return res.status(403).send({ error: 'Admins cannot ban other Owner or other Admins' });
+    if (requester.role === 'Admin' && (userToBan.role === 'Admin' || userToBan.role === 'SuperAdmin')) {
+      return res.status(403).send({ error: `${requester.role} cannot ban ${userToBan.role}` });
     }
 
     // Check if the user is already banned
     if (userToBan.bannedAt) {
-      return res.status(400).send({ error: 'User is already banned' });
+      return res.status(400).send({ error: `${userToBan.role} is already banned` });
     }
 
     await User.findByIdAndUpdate(userId, { bannedAt: new Date() });
-    res.status(200).send({ message: 'User Banned successfully' });
+    res.status(200).send({ message: `${userToBan.role} Banned successfully` });
   } catch (err) {
     res.status(500).send({ error: 'Failed to Ban' });
   }
@@ -45,17 +45,17 @@ router.post('/unbanAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async
       return res.status(404).send({ error: 'User not found' });
     }
 
-    if (requester.role === 'Admin' && userToBan.role === 'Admin' || 'SuperAdmin') {
-      return res.status(403).send({ error: 'Admins cannot unban other Owner or other Admins' });
+    if (requester.role === 'Admin' && (userToBan.role === 'Admin' || userToBan.role === 'SuperAdmin')) {
+      return res.status(403).send({ error: `${requester.role} cannot unban ${userToBan.role}` });
     }
 
     // Check if the user is not banned
     if (!userToBan.bannedAt) {
-      return res.status(400).send({ error: 'User is not banned' });
+      return res.status(400).send({ error: `${userToBan.role} is not banned` });
     }
 
     await User.findByIdAndUpdate(userId, { bannedAt: null });
-    res.status(200).send({ message: 'User unbanned successfully' });
+    res.status(200).send({ message: `${userToBan.role} unbanned successfully` });
   } catch (err) {
     res.status(500).send({ error: 'Failed to unban' });
   }
