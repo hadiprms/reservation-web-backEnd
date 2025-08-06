@@ -3,10 +3,11 @@ const Tour = require('../models/tourSchema');
 const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
 const { checkRole } = require('../authorization/checkRole');
+const roles = require('../models/roles');
 
 const router = express.Router();
 
-router.post('/tour', auth , checkRole(['Admin', 'Marketer', 'SuperAdmin']) , async (req, res) => {
+router.post('/tour', auth , checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]) , async (req, res) => {
     try {
         const existingTour = await Tour.findOne(req.body);
         if (existingTour) {

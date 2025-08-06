@@ -2,10 +2,11 @@ const express = require('express');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
 const { checkRole } = require('../authorization/checkRole');
+const roles = require('../models/roles')
 
 const router = express.Router();
 
-router.post('/banAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (req, res) => {
+router.post('/banAccount/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 
@@ -33,7 +34,7 @@ router.post('/banAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (
   }
 });
 
-router.post('/unbanAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async (req, res) => {
+router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
 
@@ -61,7 +62,7 @@ router.post('/unbanAccount/:id', auth, checkRole(['SuperAdmin','Admin']) , async
   }
 });
 
-router.patch('/admin/change-user-role/:id', auth, checkRole(['SuperAdmin','Admin']), async (req, res) => {
+router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
   const { role } = req.body;
 
@@ -86,7 +87,7 @@ router.patch('/admin/change-user-role/:id', auth, checkRole(['SuperAdmin','Admin
   }
 });
 
-router.patch('/superadmin/change-user-role/:id', auth, checkRole(['SuperAdmin']), async (req, res) => {
+router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
   const { role } = req.body;
 
@@ -120,7 +121,7 @@ router.get('/admin/role-requests', async (req, res) => {
   }
 });
 
-router.patch('/admin/approve-role-request/:id', auth, checkRole(['SuperAdmin' , 'Admin']), async (req, res) => {
+router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
 
   try {
