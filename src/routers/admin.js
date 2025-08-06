@@ -18,7 +18,7 @@ router.post('/banAccount/:id', auth, checkRole([roles.value.Admin, roles.value.S
       return res.status(404).send({ error: 'User not found' });
     }
 
-    if (requester.role === 'Admin' && (userToBan.role === 'Admin' || userToBan.role === 'SuperAdmin')) {
+    if (requester.role === roles.value.Admin && (userToBan.role === roles.value.Admin || userToBan.role === roles.value.SuperAdmin)) {
       return res.status(403).send({ error: `${requester.role} cannot ban ${userToBan.role}` });
     }
 
@@ -46,7 +46,7 @@ router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value
       return res.status(404).send({ error: 'User not found' });
     }
 
-    if (requester.role === 'Admin' && (userToBan.role === 'Admin' || userToBan.role === 'SuperAdmin')) {
+    if (requester.role === roles.value.Admin && (userToBan.role === roles.value.Admin || userToBan.role === roles.value.SuperAdmin)) {
       return res.status(403).send({ error: `${requester.role} cannot unban ${userToBan.role}` });
     }
 
@@ -92,7 +92,7 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.Su
   const { role } = req.body;
 
   // Validate role
-  const validRoles = ['Admin', 'Marketer', 'User'];
+  const validRoles = [roles.value.Admin, roles.value.Marketer, roles.value.User];
   if (!validRoles.includes(role)) {
     return res.status(400).send({ error: 'Invalid role' });
   }
