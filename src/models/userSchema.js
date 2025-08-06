@@ -7,10 +7,16 @@ const roles = require('./roles')
 //create and soft delete request and by who in wich time
 const UserSchema = new mongoose.Schema({
     role: {
-        type: String,
+        type: [String],
         enum: roles.enum,
-        default: roles.value.User
-        //should be array to can have more than one role (default)
+        default: [roles.value.User],
+        validate: {
+            validator: function(value) {
+                // Ensure every role in array is within roles.enum
+                return value.every(v => roles.enum.includes(v));
+            },
+            message: props => `${props.value} contains invalid role(s)`
+        }
     },
     roleRequest: {
         type: String,
