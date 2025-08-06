@@ -2,16 +2,20 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-
+const roles = require('./roles')
+//seperate role and req's
+//create and soft delete request and by who in wich time
 const UserSchema = new mongoose.Schema({
     role: {
         type: String,
-        enum: ['SuperAdmin','Admin', 'Marketer', 'User'],
-        default: 'User'
+        enum: roles.enum,
+        default: roles.value.User
+        //should be array to can have more than one role (default)
     },
     roleRequest: {
         type: String,
-        default: null 
+        default: null
+        //seperate table should keep that 
     },
     firstName:{
         type: String,
