@@ -11,8 +11,10 @@ const checkRole = (roles) => {
         return res.status(404).send({ error: 'User not found' });
       }
       
-      // Check if user role is in the permissible roles array
-      if (!roles.includes(user.role)) {
+      // Check if user's roles array has at least one role in the allowed roles array
+      const hasRole = user.role.some(role => roles.includes(role));
+
+      if (!hasRole) {
         return res.status(403).send({ error: `Access denied. Requires one of: ${roles.join(', ')}` });
       }
       
