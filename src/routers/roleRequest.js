@@ -1,5 +1,4 @@
 const express = require('express')
-const Tour = require('../models/tourSchema');
 const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
 const { checkRole } = require('../authorization/checkRole');
@@ -47,8 +46,11 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     await user.save();
 
     // Update the RoleRequest document's status to Approved
+    const adminId = req.user._id;
+
     roleRequestDoc.status = 'Approved';
     roleRequestDoc.processedAt = new Date();
+    roleRequestDoc.processedBy = adminId;
     await roleRequestDoc.save();
 
     res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });

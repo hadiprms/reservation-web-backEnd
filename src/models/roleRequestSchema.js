@@ -22,6 +22,10 @@ const RoleRequestSchema = new mongoose.Schema({
     processedAt: {
         type: Date,
         default: null
+    },
+    processedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
