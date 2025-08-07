@@ -1,6 +1,7 @@
 const express = require('express');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
+const RoleRequest = require('../models/roleRequestSchema');
 
 const router = express.Router();
 
@@ -21,6 +22,15 @@ router.post('/signup', async (req, res) => {
     const token = await user.generateAuthToken();
 
     await user.save();
+
+    // If roleRequest is filled, create a RoleRequest document
+    if (roleRequest) {
+      const roleReqDoc = new RoleRequest({
+        userId: user._id,
+        roleRequest,
+      });
+      await roleReqDoc.save();
+    }
 
     res.status(201).send({ user, token });
   } catch (error) {
