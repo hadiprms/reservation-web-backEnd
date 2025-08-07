@@ -4,8 +4,9 @@ require('./db/mongoose');
 const userRouter = require('./routers/user');
 const tourRouter = require('./routers/tour');
 const hotelRouter = require('./routers/hotel');
-const authorizationRouter = require('./routers/authorization')
-const adminRouter = require('./routers/admin')
+const authorizationRouter = require('./routers/authorization');
+const adminRouter = require('./routers/admin');
+const roleRequestRouter = require('./routers/roleRequest');
 const app = express();
 const port = 3000;
 
@@ -15,6 +16,7 @@ app.use(tourRouter);
 app.use(hotelRouter);
 app.use(authorizationRouter);
 app.use(adminRouter);
+app.use(roleRequestRouter);
 
 app.listen(port, () => {
     console.log('Listening on port', port);
