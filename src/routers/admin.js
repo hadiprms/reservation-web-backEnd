@@ -65,12 +65,18 @@ router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value
 
 router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
-  const { role } = req.body;
+  const { roles: newRoles } = req.body; // Expect roles as an array
 
-  // Validate role
+  if (!Array.isArray(newRoles) || newRoles.length === 0) {
+    return res.status(400).send({ error: 'Roles must be a non-empty array' });
+  }
+
   const validRoles = [roles.value.Marketer, roles.value.User];
-  if (!validRoles.includes(role)) {
-    return res.status(400).send({ error: 'Invalid role' });
+  
+  // Check if all roles are valid
+  const invalidRoles = newRoles.filter(r => !validRoles.includes(r));
+  if (invalidRoles.length > 0) {
+    return res.status(400).send({ error: `Invalid roles: ${invalidRoles.join(', ')}` });
   }
 
   try {
@@ -79,10 +85,10 @@ router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, 
       return res.status(404).send({ error: 'User not found' });
     }
 
-    user.role = role;
+    user.role = newRoles;
     await user.save();
 
-    res.send({ message: `role updated successfully to ${role}` });
+    res.send({ message: `Role(s) updated successfully.` });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -90,12 +96,19 @@ router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, 
 
 router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
-  const { role } = req.body;
+  const { roles: newRoles } = req.body; // Expect roles as an array
 
-  // Validate role
+  // Validate roles array
+  if (!Array.isArray(newRoles) || newRoles.length === 0) {
+    return res.status(400).send({ error: 'Roles must be a non-empty array' });
+  }
+
   const validRoles = [roles.value.Admin, roles.value.Marketer, roles.value.User];
-  if (!validRoles.includes(role)) {
-    return res.status(400).send({ error: 'Invalid role' });
+
+  // Check if all roles are valid
+  const invalidRoles = newRoles.filter(r => !validRoles.includes(r));
+  if (invalidRoles.length > 0) {
+    return res.status(400).send({ error: `Invalid roles: ${invalidRoles.join(', ')}` });
   }
 
   try {
@@ -104,10 +117,10 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.Su
       return res.status(404).send({ error: 'User not found' });
     }
 
-    user.role = role;
+    user.role = newRoles;
     await user.save();
 
-    res.send({ message: `role updated successfully to ${role}` });
+    res.send({ message: `Role(s) updated successfully.` });
   } catch (error) {
     res.status(400).send(error);
   }
