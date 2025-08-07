@@ -19,8 +19,8 @@ const UserSchema = new mongoose.Schema({
         }
     },
     roleRequest: {
-        type: String,
-        default: null
+        type: [String],
+        default: [null]
         //seperate table should keep that 
     },
     firstName:{
