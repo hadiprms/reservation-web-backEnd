@@ -15,7 +15,6 @@ router.get('/role-requests', async (req, res) => {
         res.status(500).send({ error: 'Failed to fetch reqs.' });
     }
 });
-//processedBy
 //if have that role reject
 router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const roleRequestId = req.params.id;
@@ -40,20 +39,20 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
 
     // Update user's role and reset roleRequest
     if (!user.role.includes(roleToAssign)) {
-      user.role.push(roleToAssign);
+        user.role.push(roleToAssign);
+        roleRequestDoc.status = 'Approved';
+        res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });
+    }else{
+        roleRequestDoc.status = 'Rejected';
+        res.send({massage: `User role request Rejected because already have that role`})
     }
     user.roleRequest = null;
     await user.save();
 
-    // Update the RoleRequest document's status to Approved
     const adminId = req.user._id;
-
-    roleRequestDoc.status = 'Approved';
     roleRequestDoc.processedAt = new Date();
     roleRequestDoc.processedBy = adminId;
     await roleRequestDoc.save();
-
-    res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });
   } catch (err) {
     console.error(err);
     res.status(500).send({ error: 'Failed to process role request' });
