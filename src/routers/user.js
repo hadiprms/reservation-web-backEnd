@@ -12,6 +12,10 @@ router.get('/users/me' , auth , async (req , res) => {
 router.patch('/edit/me/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['firstName', 'lastName', 'password', 'roleRequest'];
+
+  // Remove 'roleRequest' from updates to handle separately
+  const filteredUpdates = updates.filter(update => update !== 'roleRequest');
+
   const isValid = updates.every(update => allowedUpdates.includes(update));
 
   if (!isValid) {
@@ -25,27 +29,29 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
       return res.status(404).send();
     }
 
+    //this Function is for passing roleRequest to new table
     // Check if roleRequest is being updated
-    if (updates.includes('roleRequest') && req.body.roleRequest !== user.roleRequest) {
-      // Create a new RoleRequest document
+    if (updates.includes('roleRequest') && req.body.roleRequest !== undefined) {
+      // Append the new roleRequest to the existing array
+      user.roleRequest.push(req.body.roleRequest);
+
+      // Save the new RoleRequest document
       const newRoleReq = new RoleRequest({
         userId: user._id,
         roleRequest: req.body.roleRequest,
       });
       await newRoleReq.save();
-
-      // Optionally, alert the user or do extra logic here
     }
 
-    // Detect no change in each field
-    for (let update of updates) {
+    // Check for no change in other fields
+    for (let update of filteredUpdates) {
       if (req.body[update] === user[update]) {
         return res.status(400).send({ error: `No change detected in ${update}` });
       }
     }
 
-    // Apply updates
-    updates.forEach(update => {
+    // Apply updates for other fields
+    filteredUpdates.forEach(update => {
       user[update] = req.body[update];
     });
 
