@@ -144,7 +144,9 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     }
 
     // Update user's role and reset roleRequest
-    user.role = [roleToAssign];
+    if (!user.role.includes(roleToAssign)) {
+      user.role.push(roleToAssign);
+    }
     user.roleRequest = null;
     await user.save();
 
