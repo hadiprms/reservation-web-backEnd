@@ -68,7 +68,7 @@ router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, 
   const { role } = req.body;
 
   // Validate role
-  const validRoles = ['Marketer', 'User'];
+  const validRoles = [roles.value.Marketer, roles.value.User];
   if (!validRoles.includes(role)) {
     return res.status(400).send({ error: 'Invalid role' });
   }
