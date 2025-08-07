@@ -15,9 +15,14 @@ router.get('/role-requests', async (req, res) => {
         res.status(500).send({ error: 'Failed to fetch reqs.' });
     }
 });
-//if have that role reject
+
 router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const roleRequestId = req.params.id;
+  const { status } = req.body;
+
+  if (!status || !['Approved', 'Rejected'].includes(status)) {
+    return res.status(400).send({ error: 'Invalid status. Must be "Approved" or "Rejected".' });
+  }
 
   try {
     // Find the RoleRequest document by its ID
@@ -29,7 +34,6 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
 
     const userId = roleRequestDoc.userId;
     const roleToAssign = roleRequestDoc.roleRequest;
-
     // Find the user using userId
     const user = await User.findById(userId);
 
@@ -37,14 +41,22 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
       return res.status(404).send({ error: 'User not found' });
     }
 
+    // Set status based on input
+    roleRequestDoc.status = status;
+
     // Update user's role and reset roleRequest
-    if (!user.role.includes(roleToAssign)) {
-        user.role.push(roleToAssign);
-        roleRequestDoc.status = 'Approved';
-        res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });
-    }else{
-        roleRequestDoc.status = 'Rejected';
-        res.send({massage: `User role request Rejected because already have that role`})
+    if(status === 'Approved'){
+      if (!user.role.includes(roleToAssign)) {
+          user.role.push(roleToAssign);
+          roleRequestDoc.status = 'Approved';
+          res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });
+      }else{
+          roleRequestDoc.status = 'Rejected';
+          res.send({massage: `User role request Rejected because already have that role`})
+      }
+    }
+    if(status ==='Rejected'){
+      res.send({ message: `Role request rejected.` });
     }
     user.roleRequest = null;
     await user.save();
