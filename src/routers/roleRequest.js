@@ -58,7 +58,9 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     if(status ==='Rejected'){
       res.send({ message: `Role request rejected.` });
     }
-    user.roleRequest = null;
+    
+    // delete roleRequest value from userSchema who approved or rejected
+    user.roleRequest = user.roleRequest.filter(role => role !== roleRequestDoc.roleRequest);
     await user.save();
 
     const adminId = req.user._id;
