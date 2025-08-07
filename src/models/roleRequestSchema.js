@@ -1,0 +1,30 @@
+const mongoose = require('mongoose');
+
+const RoleRequestSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    roleRequest: {
+        type: String,
+        required: true
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    status: {
+        type: String,
+        enum: ['Pending', 'Approved', 'Rejected'],
+        default: 'Pending'
+    },
+    processedAt: {
+        type: Date,
+        default: null
+    }
+});
+
+const RoleRequest = mongoose.model('RoleRequest', RoleRequestSchema);
+
+module.exports = RoleRequest;
