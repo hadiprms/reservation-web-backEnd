@@ -52,7 +52,7 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
 
     const adminInUser =await User.findById(admin)
     if(!adminInUser.role.includes('SuperAdmin') && roleToAssign ==='Admin'){
-      res.status(400).send({massage: 'you must be SuperAdmin for accepting this request'})
+      return res.status(400).send({massage: 'you must be SuperAdmin for accepting this request'})
     }
     // Update user's role and reset roleRequest
     if(status === 'Approved'){
