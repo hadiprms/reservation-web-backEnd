@@ -48,7 +48,6 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     roleRequestDoc.processedBy = adminId;
     
     const admin = roleRequestDoc.processedBy
-    //be processedBy inja bade in code dastresi darim
 
     const adminInUser =await User.findById(admin)
     if(!adminInUser.role.includes('SuperAdmin') && roleToAssign ==='Admin'){
@@ -71,7 +70,7 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     
     // delete roleRequest value from userSchema who approved or rejected
     user.roleRequest = user.roleRequest.filter(role => role !== roleRequestDoc.roleRequest);
-    await user.save(); // mitan dakhel if kard --> user ke req dade ro save mikne
+    await user.save();
 
 
 
