@@ -3,6 +3,7 @@ const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
 const { checkRole } = require('../authorization/checkRole');
 const roles = require('../models/roles');
+const roleStatus = require('../models/roleRequestStatus')
 const RoleRequest = require('../models/roleRequestSchema');
 
 const router = express.Router();
@@ -20,7 +21,7 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
   const roleRequestId = req.params.id;
   const { status } = req.body;
 
-  if (!status || !['Approved', 'Rejected'].includes(status)) {
+  if (!status || ![roleStatus.value.Approved, roleStatus.value.Rejected].includes(status)) {
     return res.status(400).send({ error: 'Invalid status. Must be "Approved" or "Rejected".' });
   }
 
@@ -28,7 +29,7 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
     // Find the RoleRequest document by its ID
     const roleRequestDoc = await RoleRequest.findById(roleRequestId);
 
-    if (!roleRequestDoc || roleRequestDoc.status !== 'Pending') {
+    if (!roleRequestDoc || roleRequestDoc.status !== roleStatus.value.Pending) {
       return res.status(404).send({ error: 'Role request not found or already processed' });
     }
 
@@ -54,17 +55,17 @@ router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Adm
       return res.status(400).send({massage: 'you must be SuperAdmin for accepting this request'})
     }
     // Update user's role and reset roleRequest
-    if(status === 'Approved'){
+    if(status === roleStatus.value.Approved){
       if (!user.role.includes(roleToAssign)) {
           user.role.push(roleToAssign);
-          roleRequestDoc.status = 'Approved';
+          roleRequestDoc.status = roleStatus.value.Approved;
           res.send({ message: `User's role updated to ${roleToAssign} based on role request.` });
       }else{
-          roleRequestDoc.status = 'Rejected';
+          roleRequestDoc.status = roleStatus.value.Rejected;
           res.send({massage: `User role request Rejected because already have that role`})
       }
     }
-    if(status ==='Rejected'){
+    if(status ===roleStatus.value.Rejected){
       res.send({ message: `Role request rejected.` });
     }
     

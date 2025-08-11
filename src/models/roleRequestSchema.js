@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const roleStatus = require('../models/roleRequestStatus')
 
 const RoleRequestSchema = new mongoose.Schema({
     userId: {
@@ -16,8 +17,8 @@ const RoleRequestSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Approved', 'Rejected'],
-        default: 'Pending'
+        enum: roleStatus.enum,
+        default: roleStatus.value.Pending
     },
     processedAt: {
         type: Date,
