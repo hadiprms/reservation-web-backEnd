@@ -27,8 +27,13 @@ router.post('/banAccount/:id', auth, checkRole([roles.value.Admin, roles.value.S
     if (userToBan.bannedAt) {
       return res.status(400).send({ error: `${userToBan.role} is already banned` });
     }
+    
+  // Ban + invalidate all tokens (force logout)
+    await User.findByIdAndUpdate(userId, {
+      bannedAt: new Date(),
+      tokens: [] // <- removes all active JWTs
+     });
 
-    await User.findByIdAndUpdate(userId, { bannedAt: new Date() });
     res.status(200).send({ message: `${userToBan.role} Banned successfully` });
   } catch (err) {
     res.status(500).send({ error: 'Failed to Ban' });
