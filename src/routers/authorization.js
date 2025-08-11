@@ -73,7 +73,6 @@ router.post('/logoutAll' , auth , async (req,res) =>{
 
 router.delete('/deleteAccount/:id', auth , async (req, res) => {
   const userId = req.params.id;
-  //not with id
   try {
     await User.findByIdAndUpdate(userId, { deletedAt: new Date() });
     res.status(200).send({ message: 'User deleted successfully' });
