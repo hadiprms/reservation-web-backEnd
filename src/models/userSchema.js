@@ -46,7 +46,6 @@ const UserSchema = new mongoose.Schema({
     password:{
         type: String,
         required: true
-        //set min and max length
     },
     tourReservations: [{
         tourId: {
