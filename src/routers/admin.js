@@ -3,7 +3,6 @@ const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
 const { checkRole } = require('../authorization/checkRole');
 const roles = require('../models/roles');
-const RoleRequest = require('../models/roleRequestSchema');
 
 const router = express.Router();
 
@@ -131,7 +130,7 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.Su
   }
 });
 
-router.get('/admin/role-requests', async (req, res) => {
+router.get('/admin/role-requests', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   try {
     const requests = await User.find({ roleRequest: { $ne: null } });
     res.send(requests);
