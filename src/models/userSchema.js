@@ -3,8 +3,7 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const roles = require('./roles')
-//seperate role and req's
-//create and soft delete request and by who in wich time
+
 const UserSchema = new mongoose.Schema({
     role: {
         type: [String],
@@ -21,7 +20,7 @@ const UserSchema = new mongoose.Schema({
     roleRequest: {
         type: [String],
         default: [null]
-        //seperate table should keep that 
+
     },
     firstName:{
         type: String,
@@ -87,13 +86,15 @@ const UserSchema = new mongoose.Schema({
     }]
 });
 
-UserSchema.pre('save', async function(next) {
-    const user = this
+UserSchema.pre('save', async function (next) {
+    const user = this;
     if (user.isModified('password')) {
+        if (user.password.length < 8 || user.password.length > 16) {
+            return next(new Error('Password must be between 8 and 16 characters.'));
+        }
         user.password = await bcrypt.hash(user.password, 8);
     }
-
-    next();
+    return next(); // only run if no error
 });
 
 UserSchema.statics.findByCredentials = async(email , password)=>{
