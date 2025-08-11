@@ -1,7 +1,6 @@
 const User = require('../models/userSchema');
 
 const checkRole = (roles) => {
-  // roles should be an array of allowed roles
   return async (req, res, next) => {
     try {
       const userId = req.user._id;
