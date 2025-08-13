@@ -20,3 +20,12 @@ test('Should sign up new user', async () => {
         .post('/signup')
         .send(userOne)
 })
+
+test('should login exisiting user', async () => {
+    await request(app)
+        .post('/login')
+        .send({
+            email:userOne.email,
+            password:userOne.password
+        })
+})
