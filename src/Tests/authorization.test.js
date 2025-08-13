@@ -18,7 +18,14 @@ beforeEach(async()=>{
 test('Should sign up new user', async () => {
     await request(app)
         .post('/signup')
-        .send(userOne)
+        .send({
+            email: "test46@gmail.com",
+            lastName: "sflst",
+            firstName: "ffirst",
+            password: "ddd32sssss",
+            role: "Marketer"
+        })
+        .expect(201)
 })
 
 test('should login exisiting user', async () => {
@@ -28,4 +35,5 @@ test('should login exisiting user', async () => {
             email:userOne.email,
             password:userOne.password
         })
+        .expect(200)
 })
