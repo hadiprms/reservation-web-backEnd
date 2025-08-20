@@ -17,6 +17,15 @@ const options = {
         url: `http://localhost:${port}` //can add other url's for different api's in other url's
       },
     ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "Bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: ["./routers/*.js"], // Path to your route files (* => selected all files)
 };
