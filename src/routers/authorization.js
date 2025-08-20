@@ -5,6 +5,34 @@ const RoleRequest = require('../models/roleRequestSchema');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /signup:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Authorization]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *               lastName:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Email already in use
+ */
+
 router.post('/signup', async (req, res) => {
   try {
     const existingUser = await User.findOne({ email: req.body.email, deletedAt: null });
@@ -38,6 +66,30 @@ router.post('/signup', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /login:
+ *   post:
+ *     summary: Login user
+ *     tags: [Authorization]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Successful login
+ *       400:
+ *         description: Invalid credentials
+ */
+
 router.post('/login' , async (req,res)=>{
     try{
         const user = await User.findByCredentials(req.body.email , req.body.password)
@@ -47,6 +99,22 @@ router.post('/login' , async (req,res)=>{
         res.status(400).send({ error: e.message })
     }
 })
+
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: Logout from current session
+ *     tags: [Authorization]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully logged out
+ *       500:
+ *         description: Server error
+ */
+
 
 router.post('/logout' , auth , async (req,res) =>{
     try{
@@ -59,7 +127,23 @@ router.post('/logout' , auth , async (req,res) =>{
     catch(e){
         res.status(500).send()
     }
-})
+}) //log out and log out all route does not working well
+
+/**
+ * @swagger
+ * /logoutAll:
+ *   post:
+ *     summary: Logout from all sessions
+ *     tags: [Authorization]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Successfully logged out from all sessions
+ *       500:
+ *         description: Server error
+ */
+
 
 router.post('/logoutAll' , auth , async (req,res) =>{
     try{
@@ -70,6 +154,29 @@ router.post('/logoutAll' , auth , async (req,res) =>{
 
     }
 })
+
+/**
+ * @swagger
+ * /deleteAccount/{id}:
+ *   delete:
+ *     summary: Soft delete a user account
+ *     tags: [Authorization]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID to delete
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       500:
+ *         description: Failed to delete user
+ */
+
 
 router.delete('/deleteAccount/:id', auth , async (req, res) => {
   const userId = req.params.id;
