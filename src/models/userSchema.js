@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
-const roles = require('./roles')
+const roles = require('./roles');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+const JWTToken = process.env.JWTSecretCode
 
 const UserSchema = new mongoose.Schema({
     role: {
@@ -111,7 +115,7 @@ UserSchema.statics.findByCredentials = async(email , password)=>{
 
 UserSchema.methods.generateAuthToken = async function(){
     const user = this
-    const token = jwt.sign({ _id:user._id.toString() }, 'this Is Secret Code')
+    const token = jwt.sign({ _id:user._id.toString() }, JWTToken)
 
     user.tokens = user.tokens.concat({token})
     await user.save()
