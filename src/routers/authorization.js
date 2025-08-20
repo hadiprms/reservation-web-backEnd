@@ -180,7 +180,23 @@ router.post('/logoutAll' , auth , async (req,res) =>{
 
 router.delete('/deleteAccount/:id', auth , async (req, res) => {
   const userId = req.params.id;
+
+    // Check if the token belongs to the user with this id
+  if (req.user._id.toString() !== userId) {
+    return res.status(403).send({ error: 'Token is not for this user id' });
+  }
+  
   try {
+        const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    if (user.deletedAt !== null) {
+      return res.status(400).send({ error: 'User account already deleted' });
+    }
+
     await User.findByIdAndUpdate(userId, { deletedAt: new Date() });
     res.status(200).send({ message: 'User deleted successfully' });
   } catch (err) {
