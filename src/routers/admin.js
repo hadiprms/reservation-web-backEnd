@@ -6,6 +6,33 @@ const roles = require('../models/roles');
 
 const router = express.Router();
 
+
+/**
+ * @swagger
+ * /banAccount/{id}:
+ *   post:
+ *     summary: Ban an account
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID to ban
+ *     responses:
+ *       200:
+ *         description: Successfully banned user
+ *       500:
+ *         description: Failed to ban
+ *       400:
+ *         description: Already banned
+ *       403:
+ *         description: cannot ban this user
+ */
+
 router.post('/banAccount/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
@@ -39,6 +66,33 @@ router.post('/banAccount/:id', auth, checkRole([roles.value.Admin, roles.value.S
   }
 });
 
+
+/**
+ * @swagger
+ * /unbanAccount/{id}:
+ *   post:
+ *     summary: Unban an account
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID to unban
+ *     responses:
+ *       200:
+ *         description: Successfully unbanned user
+ *       500:
+ *         description: Failed to unban
+ *       400:
+ *         description: User is not banned
+ *       403:
+ *         description: cannot unban this user
+ */
+
 router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]) , async (req, res) => {
   const userId = req.params.id;
   const requesterId = req.user._id;
@@ -66,6 +120,46 @@ router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value
     res.status(500).send({ error: 'Failed to unban' });
   }
 });
+
+
+/**
+ * @swagger
+ * /admin/change-user-role/{id}:
+ *   patch:
+ *     summary: Change the user role (without having role request)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user whose role is being updated
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roles
+ *             properties:
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [Marketer, User]
+ *                 example: ["User"]
+ *     responses:
+ *       200:
+ *         description: Successfully changed
+ *       400:
+ *         description: invalid role
+ *       403:
+ *         description: user role changed
+ */
 
 router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
@@ -98,6 +192,45 @@ router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, 
   }
 });
 
+/**
+ * @swagger
+ * /superadmin/change-user-role/{id}:
+ *   patch:
+ *     summary: Change the user role (without having role request)
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+*     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user whose role is being updated
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roles
+ *             properties:
+ *               roles:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   enum: [Marketer, User, Admin]
+ *                 example: ["Admin"]
+ *     responses:
+ *       200:
+ *         description: Successfully changed
+ *       400:
+ *         description: invalid role
+ *       403:
+ *         description: user role changed
+ */
+
 router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.SuperAdmin]), async (req, res) => {
   const userId = req.params.id;
   const { roles: newRoles } = req.body; // Expect roles as an array
@@ -129,6 +262,22 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.Su
     res.status(400).send(error);
   }
 });
+
+
+/**
+ * @swagger
+ * /admin/role-requests:
+ *   get:
+ *     summary: Get's all role request's
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All request's found
+ *       500:
+ *         description: Server error
+ */
 
 router.get('/admin/role-requests', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   try {
