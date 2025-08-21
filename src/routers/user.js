@@ -120,28 +120,34 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
   const filteredUpdates = updates.filter(update => update !== 'roleRequest');
 
   const isValid = updates.every(update => allowedUpdates.includes(update));
-
   if (!isValid) {
     return res.status(400).send({ error: 'Invalid update' });
   }
 
   try {
     const user = await User.findById(req.params.id);
-
     if (!user) {
-      return res.status(404).send();
+      return res.status(404).send({ error: 'User not found' });
     }
 
-    //this Function is for passing roleRequest to new table
-    // Check if roleRequest is being updated
+    // Handle roleRequest separately
     if (updates.includes('roleRequest') && req.body.roleRequest !== undefined) {
-      // Append the new roleRequest to the existing array
-      user.roleRequest.push(req.body.roleRequest);
+      const requestedRole = req.body.roleRequest;
 
-      // Save the new RoleRequest document
+      // Check if user already requested this role
+      if (user.roleRequest.includes(requestedRole)) {
+        return res.status(400).send({
+          message: `You already requested for the role ${requestedRole}. The Admin team analysing your request.`,
+        });
+      }
+
+      // Append the new roleRequest
+      user.roleRequest.push(requestedRole);
+
+      // Save into RoleRequest collection
       const newRoleReq = new RoleRequest({
         userId: user._id,
-        roleRequest: req.body.roleRequest,
+        roleRequest: requestedRole,
       });
       await newRoleReq.save();
     }
@@ -162,7 +168,7 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
 
     res.send(user);
   } catch (e) {
-    res.status(400).send(e);
+    res.status(400).send({ error: e.message });
   }
 });
 
