@@ -7,16 +7,17 @@ const User = require('../models/userSchema')
 
 const userOneId = new mongoose.Types.ObjectId()
 const userOne = {
+    _id: userOneId,
     email: "test456@gmail.com",
     lastName: "sflst",
     firstName: "ffirst",
     password: "ddd32sssss",
     role: "Marketer",
     tokens:[{
-        token: jwt.sign({ _id: userOneId }, process.env.JWTSecretCode)
+        token: jwt.sign({ _id: userOneId }, process.env.JWTTestSecretCode)
     }]
 }
-console.log(userOne.tokens)
+
 beforeEach(async()=>{
     await User.deleteMany()
     await new User(userOne).save()
@@ -45,7 +46,7 @@ test('should login exisiting user', async () => {
         .expect(200)
 })
 
-test('should login none-exisiting user', async () => {
+test('should not login none-exisiting user', async () => {
     await request(app)
         .post('/login')
         .send({
@@ -54,3 +55,33 @@ test('should login none-exisiting user', async () => {
         })
         .expect(400)
 })
+
+test('should not logout unauthenticated user', async () => {
+    await request(app)
+        .post('/logout')
+        .send()
+        .expect(401)
+})
+
+
+test('Should logoutAll and clear all tokens', async () => {
+  await request(app)
+    .post('/logoutAll')
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200);
+
+  const user = await User.findById(userOneId);
+  expect(user.tokens.length).toBe(0);
+});
+
+test('Should soft delete account', async () => {
+  await request(app)
+    .delete(`/deleteAccount/${userOneId}`)
+    .set('Authorization', `Bearer ${userOne.tokens[0].token}`)
+    .send()
+    .expect(200);
+
+  const user = await User.findById(userOneId);
+  expect(user.deletedAt).not.toBeNull();
+});
