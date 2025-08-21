@@ -7,6 +7,53 @@ const roles = require('../models/roles');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /tour:
+ *   post:
+ *     summary: Post a hotel
+ *     tags: [Tour]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - roles
+ *             properties:
+ *                 origin:
+ *                   type: string
+ *                   example: Tabriz
+ *                 destination:
+ *                   type: string
+ *                   example: Latoon
+ *                 timeToGo:
+ *                   type: string
+ *                   example: 2025-07-30
+ *                 timeToBack:
+ *                   type: string
+ *                   example: 2025-07-31
+ *                 description:
+ *                   type: string
+ *                   example: Staying night in jungle
+ *                 price:
+ *                   type: number
+ *                   example: 34.2
+ *                 capacity:
+ *                   type: number
+ *                   example: 20
+ *     responses:
+ *       201:
+ *         description: Successfully Posted hotel
+ *       400:
+ *         description: Hotel with the same data already exists.
+ *       500:
+ *         description: Server error
+ */
+
 router.post('/tour', auth , checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]) , async (req, res) => {
     try {
         const existingTour = await Tour.findOne(req.body);
@@ -21,6 +68,29 @@ router.post('/tour', auth , checkRole([roles.value.Admin, roles.value.Marketer, 
         res.status(400).send(error);
     }
 });
+
+
+/**
+ * @swagger
+ * /reserve-tour/{tourId}:
+ *   post:
+ *     summary: Reserve a hotel
+ *     tags: [Tour]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: tourId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Tour ID to reserve
+ *     responses:
+ *       200:
+ *         description: Successfully booked tour
+ *       500:
+ *         description: Error reserving tour
+ */
 
 router.post('/reserve-tour/:tourId', auth , async (req, res) => {
     const userId = req.user._id;
@@ -40,6 +110,22 @@ router.post('/reserve-tour/:tourId', auth , async (req, res) => {
         res.status(500).send({ error: 'Error reserving tour' });
     }
 });
+
+
+/**
+ * @swagger
+ * /tours:
+ *   get:
+ *     summary: Get's all tour's
+ *     tags: [Tour]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All tour's found
+ *       500:
+ *         description: Server error
+ */
 
 router.get('/tours' , async (req , res) =>{
     try {
