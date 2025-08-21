@@ -127,7 +127,7 @@ router.post('/logout' , auth , async (req,res) =>{
     catch(e){
         res.status(500).send()
     }
-}) //log out and log out all route does not working well
+})
 
 /**
  * @swagger
