@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 require('./db/mongoose'); // DB connection
 
 const userRouter = require('./routers/user');
@@ -11,6 +12,9 @@ const { swaggerUi, swaggerSpec } = require('../swagger');
 
 const app = express();
 app.use(express.json());
+
+// Serve uploaded images
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Routers
 app.use(userRouter);

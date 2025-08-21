@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const TourSchema = new mongoose.Schema({
     companyName:{
         type: String,
-        //must not fill with hand, should get user account name
         required: true
     },
     origin:{
@@ -33,9 +32,18 @@ const TourSchema = new mongoose.Schema({
     capacity:{
         type: Number,
         required: true
+    },
+    images: {
+        type: [String], // array of file paths
+        validate: [arrayLimit, '{PATH} exceeds the limit of 5 images']
     }
-})
+    
+});
 
-const Tour = mongoose.model('Tour',TourSchema)
+function arrayLimit(val) {
+    return val.length <= 5;
+}
+
+const Tour = mongoose.model('Tour', TourSchema);
 
 module.exports = Tour;

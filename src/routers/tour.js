@@ -4,6 +4,7 @@ const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
 const { checkRole } = require('../authorization/checkRole');
 const roles = require('../models/roles');
+const upload = require('../multer/uploadMiddleware')
 
 const router = express.Router();
 
@@ -70,6 +71,8 @@ router.get('/tours' , async (req , res) =>{
  *                 capacity:
  *                   type: number
  *                   example: 20
+ *                 images:
+ *                   type: [string]
  *     responses:
  *       201:
  *         description: Successfully Posted hotel
@@ -79,20 +82,30 @@ router.get('/tours' , async (req , res) =>{
  *         description: Server error
  */
 
-router.post('/tour', auth , checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]) , async (req, res) => {
-    try {
-        const existingTour = await Tour.findOne(req.body);
-        if (existingTour) {
-            return res.status(400).send({ error: 'Tour with the same data already exists.' });
-        }
+router.post(
+    '/tour',
+    auth,
+    checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]),
+    upload.array('images', 5), // allows max 5 images
+    async (req, res) => {
+        try {
+            const existingTour = await Tour.findOne(req.body);
+            if (existingTour) {
+                return res.status(400).send({ error: 'Tour with the same data already exists.' });
+            }
 
-        const tour = new Tour(req.body);
-        await tour.save();
-        res.status(201).send(tour);
-    } catch (error) {
-        res.status(400).send(error);
+            // Add uploaded images paths to req.body
+            const images = req.files ? req.files.map(file => file.path) : [];
+            const tourData = { ...req.body, images };
+
+            const tour = new Tour(tourData);
+            await tour.save();
+            res.status(201).send(tour);
+        } catch (error) {
+            res.status(400).send({ error: error.message });
+        }
     }
-});
+);
 
 
 /**
