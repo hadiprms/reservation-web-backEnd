@@ -125,6 +125,10 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
   }
 
   try {
+    if (req.user._id.toString() !== req.params.id) {
+      return res.status(403).send({ error: 'You are not authorized to edit this user' });
+    }
+
     const user = await User.findById(req.params.id);
     if (!user) {
       return res.status(404).send({ error: 'User not found' });
