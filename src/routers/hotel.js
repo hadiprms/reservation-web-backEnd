@@ -89,7 +89,7 @@ router.post('/hotel', auth , checkRole([roles.value.Admin, roles.value.Marketer,
  *       200:
  *         description: Successfully booked hotel
  *       500:
- *         description: Error reserving tour
+ *         description: Error reserving hotel
  */
 
 router.post('/reserve-hotel/:hotelId', auth , async (req, res) => {
