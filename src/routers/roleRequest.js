@@ -8,6 +8,21 @@ const RoleRequest = require('../models/roleRequestSchema');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /role-requests:
+ *   get:
+ *     summary: Get's all role request's
+ *     tags: [Role request]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All role request's found
+ *       500:
+ *         description: Server error
+ */
+
 router.get('/role-requests', async (req, res) => {
     try {
         const reqs = await RoleRequest.find({});
@@ -16,6 +31,43 @@ router.get('/role-requests', async (req, res) => {
         res.status(500).send({ error: 'Failed to fetch reqs.' });
     }
 });
+
+
+/**
+ * @swagger
+ * /admin/approve-role-request/{id}:
+ *   patch:
+ *     summary: Approve role request
+ *     tags: [Role request]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user whose requested role
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 example: Approved
+ *     responses:
+ *       200:
+ *         description: Successfully updated status
+ *       400:
+ *         description: invalid status
+ *       500:
+ *         description: Failed to process role request
+ */
 
 router.patch('/admin/approve-role-request/:id', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
   const roleRequestId = req.params.id;
