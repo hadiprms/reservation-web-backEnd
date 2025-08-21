@@ -200,7 +200,7 @@ router.patch('/admin/change-user-role/:id', auth, checkRole([roles.value.Admin, 
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
-*     parameters:
+ *     parameters:
  *       - in: path
  *         name: id
  *         required: true
