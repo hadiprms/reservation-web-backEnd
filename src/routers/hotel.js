@@ -9,6 +9,31 @@ const router = express.Router()
 
 /**
  * @swagger
+ * /hotels:
+ *   get:
+ *     summary: Get's all hotels
+ *     tags: [Hotel]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All hotel's found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/hotels' , async (req , res) =>{
+    try {
+        const hotels = await Hotel.find({});
+        res.send(hotels);
+    } catch (error) {
+        res.status(500).send({ error: 'Failed to fetch hotels.' });
+    }
+})
+
+
+/**
+ * @swagger
  * /hotel:
  *   post:
  *     summary: Post a hotel
@@ -110,30 +135,5 @@ router.post('/reserve-hotel/:hotelId', auth , async (req, res) => {
         res.status(500).send({ error: 'Error reserving tour' });
     }
 });
-
-
-/**
- * @swagger
- * /hotels:
- *   get:
- *     summary: Get's all hotels
- *     tags: [Hotel]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: All hotel's found
- *       500:
- *         description: Server error
- */
-
-router.get('/hotels' , async (req , res) =>{
-    try {
-        const hotels = await Hotel.find({});
-        res.send(hotels);
-    } catch (error) {
-        res.status(500).send({ error: 'Failed to fetch hotels.' });
-    }
-})
 
 module.exports=router;

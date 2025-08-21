@@ -27,6 +27,52 @@ router.get('/users/me' , auth , async (req , res) => {
 
 /**
  * @swagger
+ * /my-tourReservations:
+ *   get:
+ *     summary: Get's all tour reservation's
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All reservation's found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/my-tourReservations', auth , async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate('tourReservations.tourId');
+    res.send(user.tourReservations);
+});
+
+
+/**
+ * @swagger
+ * /my-hotelReservations:
+ *   get:
+ *     summary: Get's all hotel reservation's
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All reservation's found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/my-hotelReservations', auth , async (req, res) => {
+    const userId = req.user._id;
+
+    const user = await User.findById(userId).populate('hotelReservations.hotelId');
+    res.send(user.hotelReservations);
+});
+
+
+/**
+ * @swagger
  * /edit/me/{id}:
  *   patch:
  *     summary: Edit user profile
@@ -118,52 +164,6 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
   } catch (e) {
     res.status(400).send(e);
   }
-});
-
-
-/**
- * @swagger
- * /my-tourReservations:
- *   get:
- *     summary: Get's all tour reservation's
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: All reservation's found
- *       500:
- *         description: Server error
- */
-
-router.get('/my-tourReservations', auth , async (req, res) => {
-    const userId = req.user._id;
-
-    const user = await User.findById(userId).populate('tourReservations.tourId');
-    res.send(user.tourReservations);
-});
-
-
-/**
- * @swagger
- * /my-hotelReservations:
- *   get:
- *     summary: Get's all hotel reservation's
- *     tags: [User]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: All reservation's found
- *       500:
- *         description: Server error
- */
-
-router.get('/my-hotelReservations', auth , async (req, res) => {
-    const userId = req.user._id;
-
-    const user = await User.findById(userId).populate('hotelReservations.hotelId');
-    res.send(user.hotelReservations);
 });
 
 module.exports = router;

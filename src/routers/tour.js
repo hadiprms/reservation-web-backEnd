@@ -9,6 +9,31 @@ const router = express.Router();
 
 /**
  * @swagger
+ * /tours:
+ *   get:
+ *     summary: Get's all tour's
+ *     tags: [Tour]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All tour's found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/tours' , async (req , res) =>{
+    try {
+        const tours = await Tour.find({});
+        res.send(tours);
+    } catch (error) {
+        res.status(500).send({ error: 'Failed to fetch tours.' });
+    }
+})
+
+
+/**
+ * @swagger
  * /tour:
  *   post:
  *     summary: Post a hotel
@@ -110,30 +135,5 @@ router.post('/reserve-tour/:tourId', auth , async (req, res) => {
         res.status(500).send({ error: 'Error reserving tour' });
     }
 });
-
-
-/**
- * @swagger
- * /tours:
- *   get:
- *     summary: Get's all tour's
- *     tags: [Tour]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: All tour's found
- *       500:
- *         description: Server error
- */
-
-router.get('/tours' , async (req , res) =>{
-    try {
-        const tours = await Tour.find({});
-        res.send(tours);
-    } catch (error) {
-        res.status(500).send({ error: 'Failed to fetch tours.' });
-    }
-})
 
 module.exports = router;

@@ -6,6 +6,30 @@ const roles = require('../models/roles');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /admin/role-requests:
+ *   get:
+ *     summary: Get's all role request's
+ *     tags: [Admin]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All request's found
+ *       500:
+ *         description: Server error
+ */
+
+router.get('/admin/role-requests', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
+  try {
+    const requests = await User.find({ roleRequest: { $ne: null } });
+    res.send(requests);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
 
 /**
  * @swagger
@@ -130,7 +154,7 @@ router.post('/unbanAccount/:id', auth, checkRole([roles.value.Admin, roles.value
  *     tags: [Admin]
  *     security:
  *       - bearerAuth: []
-*     parameters:
+ *     parameters:
  *       - in: path
  *         name: id
  *         required: true
@@ -260,31 +284,6 @@ router.patch('/superadmin/change-user-role/:id', auth, checkRole([roles.value.Su
     res.send({ message: `Role(s) updated successfully.` });
   } catch (error) {
     res.status(400).send(error);
-  }
-});
-
-
-/**
- * @swagger
- * /admin/role-requests:
- *   get:
- *     summary: Get's all role request's
- *     tags: [Admin]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: All request's found
- *       500:
- *         description: Server error
- */
-
-router.get('/admin/role-requests', auth, checkRole([roles.value.Admin, roles.value.SuperAdmin]), async (req, res) => {
-  try {
-    const requests = await User.find({ roleRequest: { $ne: null } });
-    res.send(requests);
-  } catch (error) {
-    res.status(500).send(error);
   }
 });
 
