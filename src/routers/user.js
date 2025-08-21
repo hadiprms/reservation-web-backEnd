@@ -5,9 +5,66 @@ const auth = require('../authorization/authorization')
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get's user profile
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User profile found
+ *       500:
+ *         description: Server error
+ */
+
 router.get('/users/me' , auth , async (req , res) => {
     res.send(req.user);
 });
+
+
+/**
+ * @swagger
+ * /edit/me/{id}:
+ *   patch:
+ *     summary: Edit user profile
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 example: Sara
+ *               lastName:
+ *                 type: string
+ *                 example: Riya
+ *               password:
+ *                 type: string
+ *                 example: 12345678
+ *               roleRequest:
+ *                 type: string
+ *                 example: Marketer
+ *     responses:
+ *       200:
+ *         description: Successfully changed
+ *       400:
+ *         description: invalid update
+ */
 
 router.patch('/edit/me/:id', auth, async (req, res) => {
   const updates = Object.keys(req.body);
@@ -63,12 +120,44 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /my-tourReservations:
+ *   get:
+ *     summary: Get's all tour reservation's
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All reservation's found
+ *       500:
+ *         description: Server error
+ */
+
 router.get('/my-tourReservations', auth , async (req, res) => {
     const userId = req.user._id;
 
     const user = await User.findById(userId).populate('tourReservations.tourId');
     res.send(user.tourReservations);
 });
+
+
+/**
+ * @swagger
+ * /my-hotelReservations:
+ *   get:
+ *     summary: Get's all hotel reservation's
+ *     tags: [User]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: All reservation's found
+ *       500:
+ *         description: Server error
+ */
 
 router.get('/my-hotelReservations', auth , async (req, res) => {
     const userId = req.user._id;
