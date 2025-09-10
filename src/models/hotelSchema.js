@@ -21,14 +21,6 @@ const HotelSchema = mongoose.Schema({
         type: Number,
         required: true
         //for each day of staying (we should have do (exitTime-bookTime=price * x) )
-    },
-    bookTime:{
-        type: Date,
-        required: true
-    },
-    exitTime:{
-        type: Date,
-        required: true
     }
 })
 
