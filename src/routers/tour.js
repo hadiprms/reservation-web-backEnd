@@ -1,4 +1,5 @@
 const express = require('express')
+const path = require('path');
 const Tour = require('../models/tourSchema');
 const auth = require('../authorization/authorization');
 const User = require('../models/userSchema');
@@ -83,28 +84,35 @@ router.get('/tours' , async (req , res) =>{
  */
 
 router.post(
-    '/tour',
-    auth,
-    checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]),
-    upload.array('images', 5), // allows max 5 images
-    async (req, res) => {
-        try {
-            const existingTour = await Tour.findOne(req.body);
-            if (existingTour) {
-                return res.status(400).send({ error: 'Tour with the same data already exists.' });
-            }
+  '/tour',
+  auth,
+  checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]),
+  upload.array('images', 5),
+  async (req, res) => {
+    try {
+      const existingTour = await Tour.findOne(req.body);
+      if (existingTour) {
+        return res.status(400).send({ error: 'Tour with the same data already exists.' });
+      }
 
-            // Add uploaded images paths to req.body
-            const images = req.files ? req.files.map(file => file.path) : [];
-            const tourData = { ...req.body, images };
+      // Base URL for backend
+      const baseUrl = `${req.protocol}://${req.get('host')}`; //http://localhost:5000
 
-            const tour = new Tour(tourData);
-            await tour.save();
-            res.status(201).send(tour);
-        } catch (error) {
-            res.status(400).send({ error: error.message });
-        }
+      // Create full URLs for uploaded images
+      const images = req.files
+        ? req.files.map(file => `${baseUrl}/uploads/tours/${path.basename(file.path)}`)
+        : [];
+
+      const tourData = { ...req.body, images };
+
+      const tour = new Tour(tourData);
+      await tour.save();
+
+      res.status(201).send(tour);
+    } catch (error) {
+      res.status(400).send({ error: error.message });
     }
+  }
 );
 
 
