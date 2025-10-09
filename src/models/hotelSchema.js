@@ -1,5 +1,9 @@
 const mongoose = require('mongoose')
 
+function arrayLimit(val) {
+  return val.length <= 5;
+}
+
 const HotelSchema = mongoose.Schema({
     hotelName:{
         type: String,
@@ -21,6 +25,10 @@ const HotelSchema = mongoose.Schema({
         type: Number,
         required: true
         //for each day of staying (we should have do (exitTime-bookTime=price * x) )
+    },
+    images: {
+        type: [String], // array of image URLs
+        validate: [arrayLimit, '{PATH} exceeds the limit of 5 images']
     }
 })
 
