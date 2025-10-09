@@ -1,9 +1,11 @@
 const express = require('express')
+const path = require('path');
 const Hotel = require('../models/hotelSchema');
 const User = require('../models/userSchema');
 const auth = require('../authorization/authorization');
 const { checkRole } = require('../authorization/checkRole');
 const roles = require('../models/roles');
+const upload = require('../multer/uploadMiddleware');
 
 const router = express.Router()
 
@@ -77,7 +79,12 @@ router.get('/hotels' , async (req , res) =>{
  *         description: Server error
  */
 
-router.post('/hotel', auth, checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]), async (req, res) => {
+router.post(
+  '/hotel',
+  auth,
+  checkRole([roles.value.Admin, roles.value.Marketer, roles.value.SuperAdmin]),
+  upload.array('images', 5), // ✅ allow up to 5 images
+  async (req, res) => {
     try {
       const { hotelName, adress, pointOfUsers, description, price } = req.body;
 
@@ -86,20 +93,27 @@ router.post('/hotel', auth, checkRole([roles.value.Admin, roles.value.Marketer, 
         return res.status(400).send({ error: 'Hotel already exists.' });
       }
 
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const images = req.files
+        ? req.files.map(file => `${baseUrl}/uploads/hotels/${path.basename(file.path)}`)
+        : [];
+
       const hotel = new Hotel({
         hotelName,
         adress,
         pointOfUsers,
         description,
-        price
+        price,
+        images
       });
 
       await hotel.save();
       res.status(201).send(hotel);
     } catch (error) {
-      res.status(400).send(error);
+      res.status(400).send({ error: error.message });
     }
-  });
+  }
+);
 
 
 /**
