@@ -1,7 +1,10 @@
 const express = require('express');
+const fs = require('fs');
+const path = require('path');
+const upload = require('../multer/uploadMiddleware');
 const User = require('../models/userSchema');
 const RoleRequest = require('../models/roleRequestSchema');
-const auth = require('../authorization/authorization')
+const auth = require('../authorization/authorization');
 
 const router = express.Router();
 
@@ -89,7 +92,7 @@ router.get('/my-hotelReservations', auth , async (req, res) => {
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             properties:
@@ -105,14 +108,22 @@ router.get('/my-hotelReservations', auth , async (req, res) => {
  *               roleRequest:
  *                 type: string
  *                 example: Marketer
+ *               profilePic:
+ *                 type: string
+ *                 format: binary
+ *                 description: Upload a profile picture (jpeg, jpg, png)
  *     responses:
  *       200:
- *         description: Successfully changed
+ *         description: Successfully updated user profile
  *       400:
- *         description: invalid update
+ *         description: Invalid update or bad request
+ *       403:
+ *         description: Unauthorized to edit this user
+ *       404:
+ *         description: User not found
  */
 
-router.patch('/edit/me/:id', auth, async (req, res) => {
+router.patch('/edit/me/:id', auth, upload.single('profilePic'), async (req, res) => {
   const updates = Object.keys(req.body);
   const allowedUpdates = ['firstName', 'lastName', 'password', 'roleRequest'];
 
@@ -134,6 +145,30 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
       return res.status(404).send({ error: 'User not found' });
     }
 
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+    // Handle uploaded profile picture
+    if (req.file) {
+      // If user already has a profile picture, delete the old one
+      if (user.profilePic) {
+        try {
+          // Extract the filename from the full URL (e.g. http://localhost:5000/uploads/users/oldname.jpg)
+          const oldFilename = path.basename(user.profilePic);
+          const oldFilePath = path.join(__dirname, '../uploads/users', oldFilename);
+
+          // Delete only if file exists
+          if (fs.existsSync(oldFilePath)) {
+            fs.unlinkSync(oldFilePath);
+          }
+        } catch (err) {
+          console.error('Failed to delete old profile picture:', err.message);
+        }
+      }
+
+      // Save new image path
+      user.profilePic = `${baseUrl}/uploads/users/${req.file.filename}`;
+    }
+
     // Handle roleRequest separately
     if (updates.includes('roleRequest') && req.body.roleRequest !== undefined) {
       const requestedRole = req.body.roleRequest;
@@ -141,7 +176,7 @@ router.patch('/edit/me/:id', auth, async (req, res) => {
       // Check if user already requested this role
       if (user.roleRequest.includes(requestedRole)) {
         return res.status(400).send({
-          message: `You already requested for the role ${requestedRole}. The Admin team analysing your request.`,
+          message: `You already requested for the role ${requestedRole}. The Admin team is analyzing your request.`,
         });
       }
 
