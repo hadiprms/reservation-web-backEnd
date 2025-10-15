@@ -51,6 +51,10 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    profilePic: {
+        type: String,
+        default: null
+    },
     tourReservations: [{
         tourId: {
             type: mongoose.Schema.Types.ObjectId,
