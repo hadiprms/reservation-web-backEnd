@@ -5,8 +5,8 @@ const fs = require('fs');
 // Map keywords to folders
 const folderMap = {
   tour: 'uploads/tours',
-  hotel: 'uploads/hotels'
-  // Add more as needed
+  hotel: 'uploads/hotels',
+  edit: 'uploads/users'
 };
 
 const storage = multer.diskStorage({
